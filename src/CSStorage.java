@@ -1,6 +1,5 @@
 
 public abstract class CSStorage {
-	
 	public abstract void savedata();
 	public abstract void loaddata();
 	

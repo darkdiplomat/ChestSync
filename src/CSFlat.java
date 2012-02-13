@@ -12,14 +12,10 @@ public class CSFlat extends CSStorage{
 	private CSData csd;
 	
 	private final String ChestSyncFile = "plugins/config/ChestSync/Chests.locs";
-	private final File Dir = new File("plugins/config/ChestSync/");
 	private File CSFile = new File(ChestSyncFile);
 	
 	public CSFlat(CSData csd, ChestSync cs){
 		this.csd = csd;
-		if(!Dir.exists()){
-			Dir.mkdirs();
-		}
 		if(!CSFile.exists()){
 			try {
 				CSFile.createNewFile();
@@ -51,7 +47,7 @@ public class CSFlat extends CSStorage{
 			}
 			in.close();
 		} catch (IOException IOE) {
-			this.cs.log.log(Level.SEVERE, "[ChestSync] - Unable to Load Chests.locs File!", IOE);
+			cs.log.log(Level.SEVERE, "[ChestSync] - Unable to Load Chests.locs File!", IOE);
 		}
 		for(String line : Lines){
 			try{

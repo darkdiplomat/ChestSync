@@ -1,4 +1,5 @@
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -259,7 +260,12 @@ public class CSMySQL extends CSStorage {
 	
 	private Connection getSQLConn() throws SQLException{
 		Connection conn = null;
-		conn = etc.getSQLConnection();
+		if(csd.CMySQL){
+			conn = etc.getSQLConnection();
+		}
+		else{
+			conn = DriverManager.getConnection(csd.DataBase, csd.UserName, csd.Password);
+		}
 		return conn;
 	}
 }

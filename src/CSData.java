@@ -1,18 +1,121 @@
-
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CSData {
+	private ChestSync cs;
 	private CSStorage CSS;
 	private HashMap<String, String[]> LinkOwners = new HashMap<String, String[]>();
 	private HashMap<String, Inventory[]> Inventories = new HashMap<String, Inventory[]>();
 	private ArrayList<Inventory> openInv = new ArrayList<Inventory>();
 	
 	private String InvInfo = "Chest§6 %s §7= X:§6 %s §7Y: §6%s §7Z:§6 %s §7World:§6 %s";
+	private String PropsLoc = "plugins/config/ChestSync/ChestSync.ini";
+	
+	private PropertiesFile Props;
+	
+	protected boolean MySQL = false, CMySQL = false;
+	protected String DataBase = "jdbc:mysql://localhost:3306/minecraft", UserName = "root", Password = "root", Drive = "com.mysql.jdbc.Driver";
 	
 	public CSData(ChestSync cs){
-		CSS = new CSMySQL(this, cs);
+		this.cs = cs;
+		File Dir = new File("plugin/config/ChestSync/");
+		File PropFile = new File(PropsLoc);
+		
+		if(!Dir.isDirectory()){
+			Dir.mkdirs();
+		}
+		
+		if(!PropFile.exists()){
+			Props = new PropertiesFile(PropsLoc);
+			Props.setBoolean("Use-MySQL", MySQL);
+			Props.setBoolean("Use-CanaryMySQLConn", CMySQL);
+			Props.setString("MySQLDataBase", DataBase);
+			Props.setString("MySQLUserName", UserName);
+			Props.setString("MySQLPassword", Password);
+			Props.setString("MySQLDriver", Drive);
+		}
+		
+		if(Props == null){
+			Props = new PropertiesFile(PropsLoc);
+		}
+		
+		loadProperties();
+		
+		if(CMySQL || MySQL){
+			CSS = new CSMySQL(this, this.cs);
+		}
+		else{
+			CSS = new CSFlat(this, this.cs);
+		}
+		
 		CSS.loaddata();
+	}
+	
+	private void loadProperties(){
+		if(Props.containsKey("Use-MySQL")){
+			MySQL = Props.getBoolean("Use-MySQL");
+		}
+		if(Props.containsKey("Use-CanaryMySQLConn")){
+			CMySQL = Props.getBoolean("Use-CanaryMySQLConn");
+		}
+		if(!CMySQL && MySQL){
+			if(Props.containsKey("MySQLDriver")){
+				Drive = Props.getString("MySQLDriver").trim();
+				if(Drive.equals("") || Drive.equals(" ")){
+					cs.log.warning("[ChestSync] - Unable to set MySQL Driver! Disabling MySQL");
+					MySQL = false;
+					return;
+				}
+				Class<?> driver = null;
+				try{
+					driver = Class.forName(Drive);
+				}catch(ClassNotFoundException CNFE){
+					cs.log.warning("[ChestSync] - Unable to set MySQL Driver! Disabling MySQL");
+					MySQL = false;
+					return;
+				}
+				if(driver != null){
+					if(Props.containsKey("MySQLDataBase")){
+						DataBase = Props.getString("MySQLDataBase").trim();
+					}
+					if(DataBase.equals("") || DataBase.equals(" ")){
+						cs.log.warning("[ChestSync] - Unable to set MySQL DataBase! Disabling MySQL");
+						MySQL = false;
+						return;
+					}
+					if(Props.containsKey("MySQLUserName")){
+						UserName = Props.getString("MySQLUserName").trim();
+					}
+					if(UserName.equals("") || UserName.equals(" ")){
+						cs.log.warning("[ChestSync] - Unable to set MySQL UserName! Disabling MySQL");
+						MySQL = false;
+						return;
+					}
+					if(Props.containsKey("MySQLPassword")){
+						Password = Props.getString("Password").trim();
+					}
+					if(Password.equals("") || Password.equals(" ")){
+						cs.log.warning("[ChestSync] - Unable to set MySQL Password! Disabling MySQL");
+						MySQL = false;
+						return;
+					}
+					try{
+						Connection conn = DriverManager.getConnection(DataBase, UserName, Password);
+						if(conn != null){
+							conn.close();
+						}
+					}catch(SQLException SQLE){
+						cs.log.warning("[ChestSync] - Unable to set MySQL Connection! Disabling MySQL");
+						MySQL = false;
+						return;
+					}
+				}
+			}
+		}
 	}
 	
 	public void callSave(ChestSync cs){

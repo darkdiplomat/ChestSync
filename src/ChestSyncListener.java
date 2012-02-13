@@ -238,6 +238,14 @@ public class ChestSyncListener extends PluginListener {
 				isSet = false;
 			}
 		}
+		else if(PL.getPlugin("ChestLock") != null && PL.getPlugin("ChestLock").isEnabled()){
+			try{
+				protect = !(Boolean)etc.getLoader().callCustomHook("ChestLock-API", new Object[] {player, block, "IS_ALLOWED"});
+			}catch(Exception E){ //API Failed/Non-Existent
+				protect = false;
+				isSet = false;
+			}
+		}
 		
 		if(PL.getPlugin("Realms") != null && PL.getPlugin("Realms").isEnabled() && !isSet){
 			try{
