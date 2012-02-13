@@ -193,12 +193,13 @@ public class ChestSyncListener extends PluginListener {
 		return false;
 	}
 	
-	public boolean onBlockPlace(Player player, Block block){
-		if(block.getType() == 54){
-			Inventory inv = (Inventory)player.getWorld().getOnlyComplexBlock(block);
-			if((inv != null) && (inv instanceof Chest)){
-				if(csd.isChestSyncInv(inv)){
-					if(DChestCheck(player, block)){
+	public boolean onBlockPlace(Player player, Block blockPlaced, Block blockClicked, Item itemInHand){
+		if(blockPlaced.getType() == 54){
+			Block chest = DChestCheck(player, blockPlaced);
+			if(chest != null){
+				Inventory inv = (Inventory)player.getWorld().getOnlyComplexBlock(chest);
+				if((inv != null) && (inv instanceof Chest)){
+					if(csd.isChestSyncInv(inv)){
 						player.sendMessage(pre+r+"Synced Chests cannot become double chests!");
 						return true;
 					}
@@ -265,7 +266,7 @@ public class ChestSyncListener extends PluginListener {
 		return protect;
 	}
 	
-	private boolean DChestCheck(Player player, Block block){
+	private Block DChestCheck(Player player, Block block){
 		int bx = block.getX(), bz = block.getZ();
 		Block block2 = player.getWorld().getBlockAt(bx-1, block.getY(), bz);
 		if(!(block2.getType() == 54)){
@@ -278,9 +279,9 @@ public class ChestSyncListener extends PluginListener {
 			block2 = player.getWorld().getBlockAt(bx, block.getY(), bz+1);
 		}
 		if(block2.getType() == 54){
-			return true;
+			return block2;
 		}
 			
-		return false;
+		return null;
 	}
 }

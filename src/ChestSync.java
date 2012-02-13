@@ -10,7 +10,7 @@ public class ChestSync extends Plugin{
 	public final Logger log = Logger.getLogger("Minecraft");
 	
 	private String name = "ChestSync";
-	protected String version = "2.0";
+	protected final String version = "2.0";
 	protected String CurrVer = "2.0";
 	private String author = "Darkdiplomat";
 	
@@ -37,7 +37,7 @@ public class ChestSync extends Plugin{
 		etc.getLoader().addListener(PluginLoader.Hook.COMMAND, csl, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_DESTROYED, csl, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_BROKEN, csl, this, PluginListener.Priority.MEDIUM);
-		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_RIGHTCLICKED, csl, this, PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener(PluginLoader.Hook.BLOCK_PLACE, csl, this, PluginListener.Priority.MEDIUM);
 	}
 	
 	public boolean isLatest(){
