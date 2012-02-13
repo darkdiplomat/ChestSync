@@ -96,7 +96,7 @@ public class CSData {
 						return;
 					}
 					if(Props.containsKey("MySQLPassword")){
-						Password = Props.getString("Password").trim();
+						Password = Props.getString("MySQLPassword").trim();
 					}
 					if(Password.equals("") || Password.equals(" ")){
 						cs.log.warning("[ChestSync] - Unable to set MySQL Password! Disabling MySQL");
